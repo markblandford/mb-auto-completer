@@ -1,3 +1,4 @@
+import { Provider } from './models/provider';
 import { ProviderService } from './services/provider/provider.service';
 import { Component, OnInit } from '@angular/core';
 @Component({
@@ -14,5 +15,9 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.providers = this.providerService.getProviders();
+  }
+
+  public providerSelected(provider: Provider) {
+    alert(provider.name);
   }
 }

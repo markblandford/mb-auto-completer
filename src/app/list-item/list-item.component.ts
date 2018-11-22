@@ -8,7 +8,8 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 export class ListItemComponent implements OnInit {
   @Input() item;
   @Output() itemSelected = new EventEmitter<any>();
-  isActive: boolean;
+
+  public isActive: boolean;
 
   constructor() { }
 
@@ -16,11 +17,11 @@ export class ListItemComponent implements OnInit {
     this.isActive = false;
   }
 
-  setActive(val) {
+  public setActive(val) {
     this.isActive = val;
   }
 
-  selectItem() {
+  public selectItem() {
     this.itemSelected.emit(this.item);
   }
 

@@ -1,18 +1,23 @@
-.search-input-wrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 
+$component-padding: 10px;
+$component-margin: 5px;
+$component-width: 250px;
+
+.auto-completer-input-wrapper {
   input {
-    padding: 10px 16px;
-    width: 100%;
-    margin-bottom: 20px;
+    width: $component-width;
+    padding: $component-padding;
+    margin: $component-margin;
   }
 }
 
-.search-results-list {
+.auto-completer-list {
+  width: $component-width + $component-padding + $component-margin + 9px;
+  margin-top: -1px;
+  background-color: white;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+
   .item {
-    margin-bottom: 10px;
-    display: block;
+    margin-bottom: 2px;
   }
 }

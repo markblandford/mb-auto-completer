@@ -1,6 +1,26 @@
-<div class="search-input-wrapper">
-  <input type="text" placeholder="search" (keyup)="inputKeyup($event)" [(ngModel)]="searchQuery">
+<div class="auto-completer-input-wrapper">
+  <input
+    type="text"
+    [(ngModel)]="searchQuery"
+    [attr.id]="'ac-' + id"
+    [attr.placeholder]="placeHolder"
+    (keydown)="inputKeydown($event)"
+    (keyup)="inputKeyup($event)"
+    (focus)="showOverlay()"
+    role="combobox"
+    aria-autocomplete="list"
+    aria-expanded="overlayVisible"
+    [attr.aria-owns]="'ac-list-' + id"
+    cdkOverlayOrigin>
 </div>
-<div *ngIf="filteredList && searchQuery" class="search-results-list">
-  <app-list-item class="item" *ngFor="let item of filteredList | slice:0:numberOfItemsToShow;" [item]="item" (itemSelected)="showItem($event)"></app-list-item>
-</div>
+
+<ng-template cdkPortal #listItemsTemplate="cdkPortal">
+  <div [attr.id]="'ac-list-' + id" class="auto-completer-list" role="listbox">
+    <app-list-item class="item"
+      *ngFor="let item of filteredList | slice:0:numberOfItemsToShow; let idx = index"
+      [item]="item"
+      (itemSelected)="showItem($event)"
+      (mouseover)="setActiveListItems(idx)">
+    </app-list-item>
+  </div>
+</ng-template>

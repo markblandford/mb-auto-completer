@@ -1,6 +1,8 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <div>
-  <app-auto-completer [items]="providers" [numberOfItemsToShow]="5"></app-auto-completer>
+  <app-auto-completer [items]="providers" [numberOfItemsToShow]="5" (itemSelected)="providerSelected($event)"></app-auto-completer>
+
+  some more text down here which shouldn't move
 </div>
 
 <router-outlet></router-outlet>

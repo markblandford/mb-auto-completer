@@ -1,5 +1,5 @@
-<div class="item" [class.item--active]="isActive">
+<div class="item" [class.item-active]="isActive" (click)="selectItem()" (mouseover)="setActive(isActive)">
   <div class="item-content">
-    <div class="item-content-name">{{item.name}} {{item.name}}</div>
+    <div class="item-content-name">{{item.name}}</div>
   </div>
 </div>
