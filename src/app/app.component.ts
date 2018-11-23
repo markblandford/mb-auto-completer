@@ -1,6 +1,10 @@
+import { AutoCompleterItem } from './auto-completer/auto-completer-item';
 import { Provider } from './models/provider';
-import { ProviderService } from './services/provider/provider.service';
 import { Component, OnInit } from '@angular/core';
+
+import * as faker from 'faker';
+import { Observable, of } from 'rxjs';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -9,15 +13,26 @@ import { Component, OnInit } from '@angular/core';
 export class AppComponent implements OnInit {
   title = 'mb-auto-complete';
 
-  public providers: any;
+  public providers$: Observable<AutoCompleterItem[]> = of([]);
 
-  constructor(private providerService: ProviderService) {}
+  constructor() {}
 
   ngOnInit() {
-    this.providers = this.providerService.getProviders();
+    const rawProviders = Array(20).fill(null).map(this.createProvider);
+
+    const items = [];
+    rawProviders.forEach(p => {
+      items.push(<AutoCompleterItem>{ id: p.name, text: p.name, item: p });
+    });
+
+    this.providers$ = of(items);
   }
 
-  public providerSelected(provider: Provider) {
-    alert(provider.name);
+  private createProvider(): Provider {
+    return <Provider>{ name: faker.company.companyName() };
+  }
+
+  public providerSelected(item: AutoCompleterItem) {
+    alert((<Provider>item.item).name);
   }
 }

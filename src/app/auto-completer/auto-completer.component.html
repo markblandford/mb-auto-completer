@@ -1,21 +1,21 @@
 <div class="auto-completer-input-wrapper">
   <input
-    type="text"
     [(ngModel)]="searchQuery"
+    type="text"
+    role="combobox"
+    autocomplete="off"
+    aria-autocomplete="list"
+    [attr.aria-owns]="'ac-list-' + id"
+    [attr.aria-expanded]="overlayVisible"
     [attr.id]="'ac-' + id"
     [attr.placeholder]="placeHolder"
     (keydown)="inputKeydown($event)"
     (keyup)="inputKeyup($event)"
-    (focus)="showOverlay()"
-    role="combobox"
-    aria-autocomplete="list"
-    aria-expanded="overlayVisible"
-    [attr.aria-owns]="'ac-list-' + id"
     cdkOverlayOrigin>
 </div>
 
 <ng-template cdkPortal #listItemsTemplate="cdkPortal">
-  <div [attr.id]="'ac-list-' + id" class="auto-completer-list" role="listbox">
+  <div [attr.id]="'ac-list-' + id" class="auto-completer-list" role="listbox" [style.max-height.px]="listMaxHeight">
     <app-list-item class="item"
       *ngFor="let item of filteredList | slice:0:numberOfItemsToShow; let idx = index"
       [item]="item"

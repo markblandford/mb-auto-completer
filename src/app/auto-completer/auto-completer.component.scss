@@ -16,6 +16,7 @@ $component-width: 250px;
   margin-top: -1px;
   background-color: white;
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  overflow-y: auto;
 
   .item {
     margin-bottom: 2px;

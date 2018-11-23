@@ -1,12 +1,35 @@
-import { ListItemComponent } from './../list-item/list-item.component';
-import { Component, EventEmitter, QueryList, ViewChildren, OnInit, AfterViewInit, Input, ViewChild, Output  } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  QueryList,
+  ViewChildren,
+  AfterViewInit,
+  Input,
+  ViewChild,
+  Output,
+  forwardRef,
+  OnChanges,
+  SimpleChanges,
+  OnInit
+} from '@angular/core';
 import { ListKeyManager } from '@angular/cdk/a11y';
-import { Overlay, OverlayConfig, OverlayRef, CdkOverlayOrigin } from '@angular/cdk/overlay';
-import { ComponentPortal, Portal, TemplatePortalDirective } from '@angular/cdk/portal';
-import { UP_ARROW, DOWN_ARROW, ENTER, ESCAPE } from '@angular/cdk/keycodes';
-import { Provider } from '../models/provider';
+import {
+  Overlay,
+  OverlayConfig,
+  OverlayRef,
+  CdkOverlayOrigin
+} from '@angular/cdk/overlay';
+import { TemplatePortalDirective } from '@angular/cdk/portal';
+import {
+  UP_ARROW,
+  DOWN_ARROW,
+  ENTER,
+  ESCAPE
+} from '@angular/cdk/keycodes';
 
-import * as faker from 'faker';
+import { ListItemComponent } from './list-item/list-item.component';
+import { AutoCompleterItem } from './auto-completer-item';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-auto-completer',
@@ -14,38 +37,38 @@ import * as faker from 'faker';
   styleUrls: ['./auto-completer.component.scss']
 })
 export class AutoCompleterComponent implements OnInit, AfterViewInit {
-  private allListItems: Provider[];
   private listItemsOverlayRef: OverlayRef;
+  private allItems: AutoCompleterItem[];
+  private firstItem: ListItemComponent;
 
   @Input() id = '0';
-  @Input() items: [];
+  @Input() items$: Observable<AutoCompleterItem[]>;
   @Input() numberOfItemsToShow = 10;
   @Input() placeHolder = 'search';
+  @Input() listMaxHeight = 'auto';
   @Output() itemSelected = new EventEmitter();
 
-  public filteredList: Provider[];
+  public filteredList: AutoCompleterItem[];
   public searchQuery = '';
   public overlayVisible = false;
 
   listKeyManager: ListKeyManager<any>;
   @ViewChild(CdkOverlayOrigin) overlayOrigin: CdkOverlayOrigin;
   @ViewChild('listItemsTemplate') listItemsTemplate: TemplatePortalDirective;
-  @ViewChildren(ListItemComponent) listItemComponents: QueryList<ListItemComponent>;
+  @ViewChildren(forwardRef(() => ListItemComponent)) listItemComponents: QueryList<ListItemComponent>;
 
   constructor(private overlay: Overlay) { }
 
   ngOnInit(): void {
-    const providers: Provider[] = Array(20).fill(null).map(this.createProvider);
-    this.allListItems = providers;
+    this.items$.subscribe(val => {
+      this.allItems = val;
+    });
   }
 
   ngAfterViewInit(): void {
     this.listKeyManager = new ListKeyManager<any>(this.listItemComponents).withWrap();
     this.initKeyManagerHandlers();
-  }
-
-  private createProvider(): Provider {
-    return <Provider>{ name: faker.company.companyName() };
+    this.initListItems();
   }
 
   private initKeyManagerHandlers() {
@@ -57,12 +80,18 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
       });
   }
 
+  private initListItems() {
+    this.listItemComponents.changes.subscribe(() => {
+      this.firstItem = this.listItemComponents.first;
+    });
+  }
+
   public showItem(item) {
     this.itemSelected.emit(item);
     this.hideOverlay();
   }
 
-  public setActiveListItems(activeItemIndex): void {
+  public setActiveListItems(activeItemIndex: number): void {
     this.listItemComponents.map((item, index) => {
       // set isActive to true for the active item otherwise false
       item.setActive(activeItemIndex === index);
@@ -82,7 +111,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
     if (event.keyCode === ESCAPE) {
       this.clearSearchQuery();
     } else {
-      this.filteredList = this.allListItems.filter(p => p.name.toLowerCase().includes(this.searchQuery.toLowerCase()));
+      this.filteredList = this.allItems.filter(p => p.text.toLowerCase().includes(this.searchQuery.toLowerCase()));
 
       this.showOverlay();
 
@@ -90,7 +119,10 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
         if (event.keyCode === DOWN_ARROW || event.keyCode === UP_ARROW) {
           this.listKeyManager.onKeydown(event);
         } else if (event.keyCode === ENTER) {
-          this.listKeyManager.activeItem.selectItem();
+          console.log(this.listItemComponents);
+          if (this.listKeyManager.activeItem) {
+            this.listKeyManager.activeItem.selectItem();
+          }
         }
       }
     }
@@ -109,6 +141,19 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
     }
 
     return false;
+  }
+
+  private selectFirstItem(): void {
+    /* istanbul ignore else */
+    if (this.listItemComponents) {
+      console.log(this.listItemComponents);
+      console.log(this.listItemComponents[0]);
+      console.log(this.listItemComponents.first);
+      this.firstItem.setActive(true);
+      // this.listItemComponents.changes.subscribe(() => {
+      //   this.listItemComponents.first.setActive(true);
+      // });
+    }
   }
 
   private hideOverlay(): void {
