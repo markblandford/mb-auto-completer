@@ -2,13 +2,9 @@
 <div>
   <app-auto-completer
     [items$]="providers$"
-    [numberOfItemsToShow]="3"
+    [numberOfItemsToShow]="10"
     (itemSelected)="providerSelected($event)"
     [listMaxHeight]="200"
   >
   </app-auto-completer>
-
-  some more text down here which shouldn't move
 </div>
-
-<router-outlet></router-outlet>

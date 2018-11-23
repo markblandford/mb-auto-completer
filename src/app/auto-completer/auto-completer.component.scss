@@ -11,6 +11,11 @@ $component-width: 250px;
   }
 }
 
+.auto-completer-status {
+  position: absolute;
+  left: 9999px;
+}
+
 .auto-completer-list {
   width: $component-width + $component-padding + $component-margin + 9px;
   margin-top: -1px;

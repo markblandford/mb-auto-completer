@@ -1,5 +1,6 @@
 export interface AutoCompleterItem {
   id: string;
-  text: string;
+  displayText: string;
+  searchableText: string;
   item?: object;
 }

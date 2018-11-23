@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
 
     const items = [];
     rawProviders.forEach(p => {
-      items.push(<AutoCompleterItem>{ id: p.name, text: p.name, item: p });
+      items.push(<AutoCompleterItem>{ id: p.name, displayText: p.name, searchableText: p.name, item: p });
     });
 
     this.providers$ = of(items);

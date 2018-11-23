@@ -7,20 +7,29 @@
     aria-autocomplete="list"
     [attr.aria-owns]="'ac-list-' + id"
     [attr.aria-expanded]="overlayVisible"
+    [attr.aria-activedescendant]="'ac-list-item-' + activeItemIndex"
     [attr.id]="'ac-' + id"
     [attr.placeholder]="placeHolder"
     (keydown)="inputKeydown($event)"
     (keyup)="inputKeyup($event)"
-    cdkOverlayOrigin>
+    cdkOverlayOrigin
+  >
 </div>
-
+<div class="auto-completer-status" role="status" aria-atomic="true" aria-live="polite">{{filterStatus}}</div>
 <ng-template cdkPortal #listItemsTemplate="cdkPortal">
   <div [attr.id]="'ac-list-' + id" class="auto-completer-list" role="listbox" [style.max-height.px]="listMaxHeight">
-    <app-list-item class="item"
-      *ngFor="let item of filteredList | slice:0:numberOfItemsToShow; let idx = index"
+    <app-list-item
+      class="item"
+      role="option"
+      *ngFor="let item of filteredItems | slice:0:numberOfItemsToShow; index as index;"
       [item]="item"
+      [attr.id]="'ac-list-item-' + index"
       (itemSelected)="showItem($event)"
-      (mouseover)="setActiveListItems(idx)">
+      (mouseover)="setActiveItem(index)"
+    >
+      <div class="item-content">
+        <div class="item-content-text">{{item.displayText}}</div>
+      </div>
     </app-list-item>
   </div>
 </ng-template>

@@ -7,29 +7,26 @@ import {
   Input,
   ViewChild,
   Output,
-  forwardRef,
-  OnChanges,
-  SimpleChanges,
   OnInit
 } from '@angular/core';
-import { ListKeyManager } from '@angular/cdk/a11y';
 import {
   Overlay,
   OverlayConfig,
   OverlayRef,
   CdkOverlayOrigin
 } from '@angular/cdk/overlay';
-import { TemplatePortalDirective } from '@angular/cdk/portal';
 import {
   UP_ARROW,
   DOWN_ARROW,
   ENTER,
   ESCAPE
 } from '@angular/cdk/keycodes';
+import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
+import { TemplatePortalDirective } from '@angular/cdk/portal';
+import { Observable } from 'rxjs';
 
 import { ListItemComponent } from './list-item/list-item.component';
 import { AutoCompleterItem } from './auto-completer-item';
-import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-auto-completer',
@@ -38,8 +35,14 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class AutoCompleterComponent implements OnInit, AfterViewInit {
   private listItemsOverlayRef: OverlayRef;
+  private listKeyManager: ActiveDescendantKeyManager<ListItemComponent>;
   private allItems: AutoCompleterItem[];
-  private firstItem: ListItemComponent;
+
+  public filteredItems: AutoCompleterItem[] = [];
+  public overlayVisible = false;
+  public searchQuery = '';
+  public filterStatus = '';
+  public activeItemIndex = -1;
 
   @Input() id = '0';
   @Input() items$: Observable<AutoCompleterItem[]>;
@@ -48,14 +51,9 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   @Input() listMaxHeight = 'auto';
   @Output() itemSelected = new EventEmitter();
 
-  public filteredList: AutoCompleterItem[];
-  public searchQuery = '';
-  public overlayVisible = false;
-
-  listKeyManager: ListKeyManager<any>;
   @ViewChild(CdkOverlayOrigin) overlayOrigin: CdkOverlayOrigin;
   @ViewChild('listItemsTemplate') listItemsTemplate: TemplatePortalDirective;
-  @ViewChildren(forwardRef(() => ListItemComponent)) listItemComponents: QueryList<ListItemComponent>;
+  @ViewChildren(ListItemComponent) listItemComponents: QueryList<ListItemComponent>;
 
   constructor(private overlay: Overlay) { }
 
@@ -66,36 +64,16 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.listKeyManager = new ListKeyManager<any>(this.listItemComponents).withWrap();
     this.initKeyManagerHandlers();
-    this.initListItems();
   }
 
   private initKeyManagerHandlers() {
-    this.listKeyManager
-      .change
-      .subscribe(activeIndex => {
-        // when the navigation item changes, we get new activeIndex
-        return this.setActiveListItems(activeIndex);
-      });
-  }
-
-  private initListItems() {
-    this.listItemComponents.changes.subscribe(() => {
-      this.firstItem = this.listItemComponents.first;
-    });
+    this.listKeyManager = new ActiveDescendantKeyManager(this.listItemComponents).withWrap();
   }
 
   public showItem(item) {
     this.itemSelected.emit(item);
     this.hideOverlay();
-  }
-
-  public setActiveListItems(activeItemIndex: number): void {
-    this.listItemComponents.map((item, index) => {
-      // set isActive to true for the active item otherwise false
-      item.setActive(activeItemIndex === index);
-    });
   }
 
   public inputKeydown(event: KeyboardEvent): void {
@@ -106,20 +84,22 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   }
 
   public inputKeyup(event: KeyboardEvent): void {
-    event.stopImmediatePropagation();
-
     if (event.keyCode === ESCAPE) {
-      this.clearSearchQuery();
+      this.hideOverlay();
     } else {
-      this.filteredList = this.allItems.filter(p => p.text.toLowerCase().includes(this.searchQuery.toLowerCase()));
-
       this.showOverlay();
+
+      this.filteredItems = this.allItems.filter(p => p.searchableText.toLowerCase().includes(this.searchQuery.toLowerCase()));
+
+      this.updateStatus();
 
       if (this.listKeyManager) {
         if (event.keyCode === DOWN_ARROW || event.keyCode === UP_ARROW) {
           this.listKeyManager.onKeydown(event);
+
+          this.updateActiveItemId();
+
         } else if (event.keyCode === ENTER) {
-          console.log(this.listItemComponents);
           if (this.listKeyManager.activeItem) {
             this.listKeyManager.activeItem.selectItem();
           }
@@ -128,14 +108,28 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private clearSearchQuery(): void {
-    this.searchQuery = '';
-    this.hideOverlay();
+  public updateStatus(): void {
+    if (this.filteredItems && this.filteredItems.length > 0) {
+      const count = Math.min(this.filteredItems.length, this.numberOfItemsToShow);
+      this.filterStatus = count + ' results found';
+    } else {
+      this.filterStatus = 'no results found';
+    }
+  }
+
+  public setActiveItem(index: number): void {
+    this.listKeyManager.setActiveItem(index);
   }
 
   public showOverlay(): boolean {
-    if (!this.overlayVisible && this.filteredList) {
+    if (!this.overlayVisible) {
       this.displayOverlay();
+
+      // this is a hack but the only way I can figure out to select the first item in the drop-down automatically.
+      setTimeout(() => {
+        this.listKeyManager.setFirstItemActive();
+        this.updateActiveItemId();
+      }, 10);
 
       return true;
     }
@@ -143,16 +137,11 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
     return false;
   }
 
-  private selectFirstItem(): void {
-    /* istanbul ignore else */
-    if (this.listItemComponents) {
-      console.log(this.listItemComponents);
-      console.log(this.listItemComponents[0]);
-      console.log(this.listItemComponents.first);
-      this.firstItem.setActive(true);
-      // this.listItemComponents.changes.subscribe(() => {
-      //   this.listItemComponents.first.setActive(true);
-      // });
+  private updateActiveItemId() {
+    if (this.listKeyManager.activeItem) {
+      this.activeItemIndex = this.listKeyManager.activeItemIndex;
+    } else {
+      this.activeItemIndex = -1;
     }
   }
 

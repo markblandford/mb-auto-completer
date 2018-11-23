@@ -1,28 +1,34 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Highlightable } from '@angular/cdk/a11y';
+import { AutoCompleterItem } from '../auto-completer-item';
 
 @Component({
   selector: 'app-list-item',
   templateUrl: './list-item.component.html',
   styleUrls: ['./list-item.component.scss']
 })
-export class ListItemComponent implements OnInit {
-  @Input() item;
-  @Output() itemSelected = new EventEmitter<any>();
+export class ListItemComponent implements Highlightable {
+  private _isActive = false;
 
-  public isActive: boolean;
+  @Input() item: AutoCompleterItem;
+  @Input() disabled = false;
+  @Output() itemSelected = new EventEmitter<AutoCompleterItem>();
 
   constructor() { }
 
-  ngOnInit() {
-    this.isActive = false;
-  }
-
-  public setActive(val) {
-    this.isActive = val;
+  public get isActive() {
+    return this._isActive;
   }
 
   public selectItem() {
     this.itemSelected.emit(this.item);
   }
 
+  setActiveStyles(): void {
+    this._isActive = true;
+  }
+
+  setInactiveStyles(): void {
+    this._isActive = false;
+  }
 }
