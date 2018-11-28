@@ -50,7 +50,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   @Input() items$: Observable<AutoCompleterItem[]>;
   @Input() listMaxHeight = 'auto';
   @Input() numberOfItemsToShow = 10;
-  @Input() placeHolder = 'search';
+  @Input() placeholder = 'search';
 
   @Output() itemSelected = new EventEmitter<AutoCompleterItem>();
 
