@@ -1,6 +1,7 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { Highlightable } from '@angular/cdk/a11y';
-import { AutoCompleterItem } from '../auto-completer-item';
+
+import { AutoCompleterItem } from '..';
 
 @Component({
   selector: 'app-list-item',

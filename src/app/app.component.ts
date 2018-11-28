@@ -1,9 +1,9 @@
-import { AutoCompleterItem } from './auto-completer/auto-completer-item';
 import { Provider } from './models/provider';
 import { Component, OnInit } from '@angular/core';
 
 import * as faker from 'faker';
 import { Observable, of } from 'rxjs';
+import { AutoCompleterItem } from './auto-completer';
 
 @Component({
   selector: 'app-root',

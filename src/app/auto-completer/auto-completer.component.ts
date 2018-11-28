@@ -21,12 +21,12 @@ import {
   ENTER,
   ESCAPE
 } from '@angular/cdk/keycodes';
-import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
+import { ActiveDescendantKeyManager, ListKeyManager } from '@angular/cdk/a11y';
 import { TemplatePortalDirective } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
 
 import { ListItemComponent } from './list-item/list-item.component';
-import { AutoCompleterItem } from './auto-completer-item';
+import { AutoCompleterItem } from '.';
 
 @Component({
   selector: 'app-auto-completer',
@@ -49,13 +49,14 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   @Input() numberOfItemsToShow = 10;
   @Input() placeHolder = 'search';
   @Input() listMaxHeight = 'auto';
-  @Output() itemSelected = new EventEmitter();
+  @Output() itemSelected = new EventEmitter<AutoCompleterItem>();
 
   @ViewChild(CdkOverlayOrigin) overlayOrigin: CdkOverlayOrigin;
   @ViewChild('listItemsTemplate') listItemsTemplate: TemplatePortalDirective;
   @ViewChildren(ListItemComponent) listItemComponents: QueryList<ListItemComponent>;
 
-  constructor(private overlay: Overlay) { }
+  constructor(
+    private overlay: Overlay) { }
 
   ngOnInit(): void {
     this.items$.subscribe(val => {
@@ -71,19 +72,22 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
     this.listKeyManager = new ActiveDescendantKeyManager(this.listItemComponents).withWrap();
   }
 
-  public showItem(item) {
+  public showItem(item: AutoCompleterItem): void {
     this.itemSelected.emit(item);
     this.hideOverlay();
   }
 
-  public inputKeydown(event: KeyboardEvent): void {
+  public inputKeydown(event: KeyboardEvent): boolean {
     // stop the cursor moving in the input box
     if (event.keyCode === DOWN_ARROW || event.keyCode === UP_ARROW) {
       event.preventDefault();
+      return false;
     }
+
+    return true;
   }
 
-  public inputKeyup(event: KeyboardEvent): void {
+  public inputKeyup(event: KeyboardEvent): boolean {
     if (event.keyCode === ESCAPE) {
       this.hideOverlay();
     } else {
@@ -93,6 +97,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
 
       this.updateStatus();
 
+      /* istanbul ignore else */
       if (this.listKeyManager) {
         if (event.keyCode === DOWN_ARROW || event.keyCode === UP_ARROW) {
           this.listKeyManager.onKeydown(event);
@@ -100,18 +105,25 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
           this.updateActiveItemId();
 
         } else if (event.keyCode === ENTER) {
+          /* istanbul ignore else */
           if (this.listKeyManager.activeItem) {
             this.listKeyManager.activeItem.selectItem();
           }
         }
       }
     }
+
+    return false;
   }
 
-  public updateStatus(): void {
+  private updateStatus(): void {
     if (this.filteredItems && this.filteredItems.length > 0) {
       const count = Math.min(this.filteredItems.length, this.numberOfItemsToShow);
-      this.filterStatus = count + ' results found';
+      if (count === 1) {
+        this.filterStatus = '1 result found';
+      } else {
+        this.filterStatus = count + ' results found';
+      }
     } else {
       this.filterStatus = 'no results found';
     }
@@ -119,6 +131,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
 
   public setActiveItem(index: number): void {
     this.listKeyManager.setActiveItem(index);
+    this.activeItemIndex = index;
   }
 
   public showOverlay(): boolean {
@@ -163,7 +176,8 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
     const config = new OverlayConfig({
       hasBackdrop: true,
       backdropClass: 'cdk-overlay-transparent-backdrop',
-      positionStrategy: positionStrategy
+      positionStrategy: positionStrategy,
+      scrollStrategy: this.overlay.scrollStrategies.close()
     });
 
     this.listItemsOverlayRef = this.overlay.create(config);
