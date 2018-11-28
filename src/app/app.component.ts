@@ -11,8 +11,6 @@ import { AutoCompleterItem } from './auto-completer';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'mb-auto-complete';
-
   public providers$: Observable<AutoCompleterItem[]> = of([]);
 
   constructor() {}
