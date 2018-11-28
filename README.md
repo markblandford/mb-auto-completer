@@ -12,6 +12,24 @@ I love the [Angular Material Components](https://material.angular.io/components/
 
 It is an example of an auto-complete / typeahead component built using Angular CLI and using the [Angular Material CDK](https://material.angular.io/cdk/categories). The component has been developed with accessibility in mind (to the best of my knowledge) and so should work nicely without a mouse and screen readers (only tested with [MacOS VoiceOver](https://www.apple.com/uk/accessibility/mac/vision/)).
 
+## Features
+
+### Input Variables
+
+| Variable | type | Description | Default |
+|----------|------|-------------|---------|
+| `id` | `string` | A suffix to add to the html id. Useful if there are multiple components on the same page. | `'0'` |
+| `items$` | `Observable<AutoCompleterItem[]>` | The items to show in the auto-completer list | *REQUIRED* |
+| `listMaxHeight` | `string` | The maximum height to apply to the drop-down list in pixels. If this is less than the total height of the list items, then the list becomes scrollable. | `'auto'` |
+| `numberOfItemsToShow` | `number` | The maximum number of items to show in the drop-down list. | `10` |
+| `placeholder` | `string` | The placeholder text to show in the input. This is also the aria-label to be used. | `'search'` |
+
+### Output Variables / Events
+
+| Variable | type | Description |
+|----------|------|-------------|
+| `itemSelected` | Event emitting an object of type `AutoCompleterItem` | Emitted when an item in the list is selected. |
+
 ## Browser Support
 
 * I have so far only tested this in Chrome (70) and Safari (11.1.2) and I assume it'll work in Firefox.
