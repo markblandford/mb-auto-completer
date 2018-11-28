@@ -307,4 +307,21 @@ describe('AutoCompleterComponent', () => {
 
     expect(component.overlayVisible).toEqual(false);
   }));
+
+  it('should scroll to the list item upon keyup of the down and up arrow keys', () => {
+    const keyDown = <KeyboardEvent>{ keyCode: DOWN_ARROW, preventDefault: () => {} };
+    const keyUp = <KeyboardEvent>{ keyCode: UP_ARROW, preventDefault: () => {} };
+
+    const fakeElement = jasmine.createSpyObj('HTMLElement', [ 'scrollIntoView' ]);
+
+    spyOn(document, 'getElementById').and.returnValue(fakeElement);
+
+    component.listItemComponents = fakeListItemComponents;
+    component.ngAfterViewInit();
+
+    component.inputKeyup(keyDown);
+    component.inputKeyup(keyUp);
+
+    expect(fakeElement.scrollIntoView).toHaveBeenCalledTimes(2);
+  });
 });

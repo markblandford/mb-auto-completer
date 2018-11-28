@@ -23,7 +23,7 @@
       role="option"
       *ngFor="let item of filteredItems | slice:0:numberOfItemsToShow; index as index;"
       [item]="item"
-      [attr.id]="'ac-list-item-' + index"
+      [attr.id]="listItemIdPrefix + index"
       (itemSelected)="showItem($event)"
       (mouseover)="setActiveItem(index)"
     >

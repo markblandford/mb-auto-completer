@@ -21,12 +21,12 @@ import {
   ENTER,
   ESCAPE
 } from '@angular/cdk/keycodes';
-import { ActiveDescendantKeyManager, ListKeyManager } from '@angular/cdk/a11y';
+import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
 import { TemplatePortalDirective } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
 
-import { ListItemComponent } from './list-item/list-item.component';
 import { AutoCompleterItem } from '.';
+import { ListItemComponent } from './list-item/list-item.component';
 
 @Component({
   selector: 'app-auto-completer',
@@ -34,29 +34,31 @@ import { AutoCompleterItem } from '.';
   styleUrls: ['./auto-completer.component.scss']
 })
 export class AutoCompleterComponent implements OnInit, AfterViewInit {
-  private listItemsOverlayRef: OverlayRef;
-  private listKeyManager: ActiveDescendantKeyManager<ListItemComponent>;
   private allItems: AutoCompleterItem[];
+  private listKeyManager: ActiveDescendantKeyManager<ListItemComponent>;
+  private listItemsOverlayRef: OverlayRef;
 
+  public readonly listItemIdPrefix = 'ac-list-item-';
+
+  public activeItemIndex = -1;
   public filteredItems: AutoCompleterItem[] = [];
+  public filterStatus = '';
   public overlayVisible = false;
   public searchQuery = '';
-  public filterStatus = '';
-  public activeItemIndex = -1;
 
   @Input() id = '0';
   @Input() items$: Observable<AutoCompleterItem[]>;
+  @Input() listMaxHeight = 'auto';
   @Input() numberOfItemsToShow = 10;
   @Input() placeHolder = 'search';
-  @Input() listMaxHeight = 'auto';
+
   @Output() itemSelected = new EventEmitter<AutoCompleterItem>();
 
-  @ViewChild(CdkOverlayOrigin) overlayOrigin: CdkOverlayOrigin;
   @ViewChild('listItemsTemplate') listItemsTemplate: TemplatePortalDirective;
+  @ViewChild(CdkOverlayOrigin) overlayOrigin: CdkOverlayOrigin;
   @ViewChildren(ListItemComponent) listItemComponents: QueryList<ListItemComponent>;
 
-  constructor(
-    private overlay: Overlay) { }
+  constructor(private overlay: Overlay) { }
 
   ngOnInit(): void {
     this.items$.subscribe(val => {
@@ -100,7 +102,13 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
       /* istanbul ignore else */
       if (this.listKeyManager) {
         if (event.keyCode === DOWN_ARROW || event.keyCode === UP_ARROW) {
+
           this.listKeyManager.onKeydown(event);
+
+          /* istanbul ignore else */
+          if (this.listKeyManager.activeItem) {
+            this.scrollToListItem();
+          }
 
           this.updateActiveItemId();
 
@@ -155,6 +163,14 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
       this.activeItemIndex = this.listKeyManager.activeItemIndex;
     } else {
       this.activeItemIndex = -1;
+    }
+  }
+
+  private scrollToListItem(): void {
+    const el = document.getElementById(this.listItemIdPrefix + this.listKeyManager.activeItemIndex);
+    /* istanbul ignore else */
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
     }
   }
 
