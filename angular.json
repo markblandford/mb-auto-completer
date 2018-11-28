@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "mb-auto-complete": {
+    "mb-auto-completer": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/mb-auto-complete",
+            "outputPath": "dist/mb-auto-completer",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -62,18 +62,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "mb-auto-complete:build"
+            "browserTarget": "mb-auto-completer:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "mb-auto-complete:build:production"
+              "browserTarget": "mb-auto-completer:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "mb-auto-complete:build"
+            "browserTarget": "mb-auto-completer:build"
           }
         },
         "test": {
@@ -107,7 +107,7 @@
         }
       }
     },
-    "mb-auto-complete-e2e": {
+    "mb-auto-completer-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -116,11 +116,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "mb-auto-complete:serve"
+            "devServerTarget": "mb-auto-completer:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "mb-auto-complete:serve:production"
+              "devServerTarget": "mb-auto-completer:serve:production"
             }
           }
         },
@@ -136,5 +136,5 @@
       }
     }
   },
-  "defaultProject": "mb-auto-complete"
+  "defaultProject": "mb-auto-completer"
 }
