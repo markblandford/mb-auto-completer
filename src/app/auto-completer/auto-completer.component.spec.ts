@@ -137,14 +137,19 @@ describe('AutoCompleterComponent', () => {
     expect(result).toEqual(true);
   });
 
-  it('should hide the overlay on keyup of the escape key', () => {
+  it('should hide the overlay on keyup of the escape key and clear the status', () => {
     const keyEsc = <KeyboardEvent>{ keyCode: ESCAPE };
 
-    const spyHideOverlay = spyOn<any>(component, 'hideOverlay');
+    const spyHideOverlay = spyOn<any>(component, 'hideOverlay').and.callThrough();
+
+    component.showOverlay();
+    component['updateStatus']();
+    expect(component.filterStatus).toEqual('no results found');
 
     component.inputKeyup(keyEsc);
 
     expect(spyHideOverlay).toHaveBeenCalledTimes(1);
+    expect(component.filterStatus).toBeNull();
   });
 
   it('should show the overlay with the filtered items and update the status upon keyup of the "p" key', () => {

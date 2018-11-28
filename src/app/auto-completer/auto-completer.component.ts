@@ -124,8 +124,11 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
     return false;
   }
 
-  private updateStatus(): void {
-    if (this.filteredItems && this.filteredItems.length > 0) {
+  private updateStatus(clear = false): void {
+    console.log(clear);
+    if (clear) {
+      this.filterStatus = null;
+    } else if (this.filteredItems && this.filteredItems.length > 0) {
       const count = Math.min(this.filteredItems.length, this.numberOfItemsToShow);
       if (count === 1) {
         this.filterStatus = '1 result found';
@@ -175,6 +178,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   }
 
   private hideOverlay(): void {
+    this.updateStatus(true);
     this.overlayVisible = false;
     this.listItemsOverlayRef.dispose();
   }

@@ -16,7 +16,7 @@
     cdkOverlayOrigin
   >
 </div>
-<div class="auto-completer-status" role="status" aria-atomic="true" aria-live="polite">{{filterStatus}}</div>
+<div *ngIf="filterStatus" class="auto-completer-status" role="status" aria-atomic="true" aria-live="polite">{{filterStatus}}</div>
 <ng-template cdkPortal #listItemsTemplate="cdkPortal">
   <div [attr.id]="'ac-list-' + id" class="auto-completer-list" role="listbox" [style.max-height.px]="listMaxHeight">
     <app-list-item
