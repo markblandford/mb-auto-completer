@@ -16,18 +16,19 @@ import {
   CdkOverlayOrigin,
   ConnectionPositionPair
 } from '@angular/cdk/overlay';
-import {
-  UP_ARROW,
-  DOWN_ARROW,
-  ENTER,
-  ESCAPE
-} from '@angular/cdk/keycodes';
 import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
 import { TemplatePortalDirective } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
 
 import { AutoCompleterItem } from '.';
 import { ListItemComponent } from './list-item/list-item.component';
+
+enum KeyCodes {
+  DOWN_ARROW = 'ArrowDown',
+  UP_ARROW = 'ArrowUp',
+  ESCAPE = 'Escape',
+  ENTER = 'Enter'
+}
 
 @Component({
   selector: 'app-auto-completer',
@@ -82,7 +83,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
 
   public inputKeydown(event: KeyboardEvent): boolean {
     // stop the cursor moving in the input box
-    if (event.keyCode === DOWN_ARROW || event.keyCode === UP_ARROW) {
+    if (event.code === KeyCodes.DOWN_ARROW || event.code === KeyCodes.UP_ARROW) {
       event.preventDefault();
       return false;
     }
@@ -91,7 +92,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   }
 
   public inputKeyup(event: KeyboardEvent): boolean {
-    if (event.keyCode === ESCAPE) {
+    if (event.code === KeyCodes.ESCAPE) {
       this.hideOverlay();
     } else {
       this.showOverlay();
@@ -102,7 +103,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
 
       /* istanbul ignore else */
       if (this.listKeyManager) {
-        if (event.keyCode === DOWN_ARROW || event.keyCode === UP_ARROW) {
+        if (event.code === KeyCodes.DOWN_ARROW || event.code === KeyCodes.UP_ARROW) {
 
           this.listKeyManager.onKeydown(event);
 
@@ -113,7 +114,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
 
           this.updateActiveItemId();
 
-        } else if (event.keyCode === ENTER) {
+        } else if (event.code === KeyCodes.ENTER) {
           /* istanbul ignore else */
           if (this.listKeyManager.activeItem) {
             this.listKeyManager.activeItem.selectItem();
@@ -126,7 +127,6 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   }
 
   private updateStatus(clear = false): void {
-    console.log(clear);
     if (clear) {
       this.filterStatus = null;
     } else if (this.filteredItems && this.filteredItems.length > 0) {

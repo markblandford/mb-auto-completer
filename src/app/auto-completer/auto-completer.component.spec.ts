@@ -19,11 +19,22 @@ import {
   P,
   Z
 } from '@angular/cdk/keycodes';
-
 import { AutoCompleterComponent } from './auto-completer.component';
 import { AutoCompleterItem } from '.';
 import { ListItemComponent } from './list-item/list-item.component';
 import { QueryList, ElementRef } from '@angular/core';
+
+// seems the ActiveDescendantKeyManager is still using the deprecated keyCode property, hence this mapping
+const keys = {
+  'DOWN_ARROW': [DOWN_ARROW, 'ArrowDown'],
+  'UP_ARROW': [UP_ARROW, 'ArrowUp'],
+  'LEFT_ARROW': [LEFT_ARROW, 'ArrowLeft'],
+  'ESCAPE': [ESCAPE, 'Escape'],
+  'ENTER': [ENTER, 'Enter'],
+  'h': [H, 'h'],
+  'p': [P, 'p'],
+  'z': [Z, 'z']
+};
 
 class FakeQueryList<T> extends QueryList<T> {
   changes = new Subject<FakeQueryList<T>>();
@@ -116,9 +127,9 @@ describe('AutoCompleterComponent', () => {
   });
 
   it('should prevent the default KeyboardEvent behavior only on keydown of the up and down arrow keys', () => {
-    const keyDown = <KeyboardEvent>{ keyCode: DOWN_ARROW, preventDefault: () => {} };
-    const keyUp = <KeyboardEvent>{ keyCode: UP_ARROW, preventDefault: () => {} };
-    const keyLeft = <KeyboardEvent>{ keyCode: LEFT_ARROW, preventDefault: () => {} };
+    const keyDown = <KeyboardEvent>{ code: keys['DOWN_ARROW'][1], keyCode: keys['DOWN_ARROW'][0], preventDefault: () => {} };
+    const keyUp = <KeyboardEvent>{ code: keys['UP_ARROW'][1], keyCode: keys['UP_ARROW'][0], preventDefault: () => {} };
+    const keyLeft = <KeyboardEvent>{ code: keys['LEFT_ARROW'][1], keyCode: keys['LEFT_ARROW'][0], preventDefault: () => {} };
 
     const spyKeyDown = spyOn(keyDown, 'preventDefault');
     const spyKeyUp = spyOn(keyUp, 'preventDefault');
@@ -138,7 +149,7 @@ describe('AutoCompleterComponent', () => {
   });
 
   it('should hide the overlay on keyup of the escape key and clear the status', () => {
-    const keyEsc = <KeyboardEvent>{ keyCode: ESCAPE };
+    const keyEsc = <KeyboardEvent>{ code: keys['ESCAPE'][1], keyCode: keys['ESCAPE'][0] };
 
     const spyHideOverlay = spyOn<any>(component, 'hideOverlay').and.callThrough();
 
@@ -153,7 +164,7 @@ describe('AutoCompleterComponent', () => {
   });
 
   it('should show the overlay with the filtered items and update the status upon keyup of the "p" key', () => {
-    const keyK = <KeyboardEvent>{ keyCode: P };
+    const keyK = <KeyboardEvent>{ code: keys['p'][1], keyCode: keys['p'][0] };
 
     const expectedFilteredItems = [
       <AutoCompleterItem>{ id: '1', displayText: 'Death Grips', searchableText: 'death grips rap'}
@@ -170,7 +181,7 @@ describe('AutoCompleterComponent', () => {
   });
 
   it('should set the status to no results found when there are no results in the filter', () => {
-    const keyZ = <KeyboardEvent>{ keyCode: Z };
+    const keyZ = <KeyboardEvent>{ code: keys['z'][1], keyCode: keys['z'][0] };
 
     const expectedFilteredItems = [];
 
@@ -185,7 +196,7 @@ describe('AutoCompleterComponent', () => {
   });
 
   it('should set the status to the number of results found when there are more than one result in the filter', () => {
-    const keyH = <KeyboardEvent>{ keyCode: H };
+    const keyH = <KeyboardEvent>{ code: keys['h'][1], keyCode: keys['h'][0] };
 
     const expectedFilteredItems = [
       <AutoCompleterItem>{ id: '1', displayText: 'Death Grips', searchableText: 'death grips rap'},
@@ -204,8 +215,8 @@ describe('AutoCompleterComponent', () => {
   });
 
   it('should navigate through the list upon keyup of the down and up arrow keys', () => {
-    const keyDown = <KeyboardEvent>{ keyCode: DOWN_ARROW, preventDefault: () => {} };
-    const keyUp = <KeyboardEvent>{ keyCode: UP_ARROW, preventDefault: () => {} };
+    const keyDown = <KeyboardEvent>{ code: keys['DOWN_ARROW'][1], keyCode: keys['DOWN_ARROW'][0], preventDefault: () => {} };
+    const keyUp = <KeyboardEvent>{ code: keys['UP_ARROW'][1], keyCode: keys['UP_ARROW'][0], preventDefault: () => {} };
 
     component.listItemComponents = fakeListItemComponents;
     component.ngAfterViewInit();
@@ -228,8 +239,8 @@ describe('AutoCompleterComponent', () => {
   });
 
   it('should select the active item upon keyup of the enter key', () => {
-    const keyDown = <KeyboardEvent>{ keyCode: DOWN_ARROW, preventDefault: () => {} };
-    const keyEnter = <KeyboardEvent>{ keyCode: ENTER, preventDefault: () => {} };
+    const keyDown = <KeyboardEvent>{ code: keys['DOWN_ARROW'][1], keyCode: keys['DOWN_ARROW'][0], preventDefault: () => {} };
+    const keyEnter = <KeyboardEvent>{ code: keys['ENTER'][1], keyCode: keys['ENTER'][0], preventDefault: () => {} };
 
     component.listItemComponents = fakeListItemComponents;
     component.ngAfterViewInit();
@@ -314,8 +325,8 @@ describe('AutoCompleterComponent', () => {
   }));
 
   it('should scroll to the list item upon keyup of the down and up arrow keys', () => {
-    const keyDown = <KeyboardEvent>{ keyCode: DOWN_ARROW, preventDefault: () => {} };
-    const keyUp = <KeyboardEvent>{ keyCode: UP_ARROW, preventDefault: () => {} };
+    const keyDown = <KeyboardEvent>{ code: keys['DOWN_ARROW'][1], keyCode: keys['DOWN_ARROW'][0], preventDefault: () => {} };
+    const keyUp = <KeyboardEvent>{ code: keys['UP_ARROW'][1], keyCode: keys['UP_ARROW'][0], preventDefault: () => {} };
 
     const fakeElement = jasmine.createSpyObj('HTMLElement', [ 'scrollIntoView' ]);
 
