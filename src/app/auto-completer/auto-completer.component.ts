@@ -13,7 +13,8 @@ import {
   Overlay,
   OverlayConfig,
   OverlayRef,
-  CdkOverlayOrigin
+  CdkOverlayOrigin,
+  ConnectionPositionPair
 } from '@angular/cdk/overlay';
 import {
   UP_ARROW,
@@ -186,12 +187,18 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   private displayOverlay(): void {
     this.overlayVisible = true;
 
+    const positions = [
+      new ConnectionPositionPair(
+        { originX: 'start', originY: 'bottom' },
+        { overlayX: 'start', overlayY: 'top' }),
+       new ConnectionPositionPair(
+       { originX: 'start', originY: 'top' },
+       { overlayX: 'start', overlayY: 'bottom' })
+    ];
+
     const positionStrategy = this.overlay.position()
-      .connectedTo(
-        this.overlayOrigin.elementRef,
-        {originX: 'start', originY: 'bottom'},
-        {overlayX: 'start', overlayY: 'top'},
-      );
+      .flexibleConnectedTo(this.overlayOrigin.elementRef)
+      .withPositions(positions);
 
     const config = new OverlayConfig({
       hasBackdrop: true,
