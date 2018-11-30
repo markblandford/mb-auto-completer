@@ -10,7 +10,7 @@ import { AutoCompleterComponent } from './auto-completer.component';
 @NgModule({
   declarations: [
     ListItemComponent,
-    AutoCompleterComponent,
+    AutoCompleterComponent
   ],
   imports: [
     CommonModule,

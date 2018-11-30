@@ -27,8 +27,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss",
-              "./node_modules/@angular/cdk/overlay-prebuilt.css"
+              "./node_modules/@angular/cdk/overlay-prebuilt.css",
+              "src/styles.scss"
             ],
             "scripts": []
           },

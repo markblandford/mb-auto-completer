@@ -1,6 +1,5 @@
 @import 'colors';
 
-
 $component-padding: 10px;
 $component-margin: 5px;
 $component-width: 250px;
@@ -28,7 +27,6 @@ $component-width: 250px;
 
 .auto-completer-list {
   width: $component-width + $component-padding + $component-margin + 9px;
-  margin-top: -1px;
   background-color: white;
   box-shadow: 0 0 20px rgba(0,92,138,0.5);
   overflow-y: auto;
@@ -36,4 +34,12 @@ $component-width: 250px;
   .item {
     margin-bottom: 2px;
   }
+}
+
+/* style is imported from "./node_modules/@angular/cdk/overlay-prebuilt.css".
+   However, max-height: 100% appears to cause us a problem when we set the max-height
+   of the drop-down / drop-up.
+*/
+::ng-deep .cdk-overlay-pane {
+  max-height: none;
 }

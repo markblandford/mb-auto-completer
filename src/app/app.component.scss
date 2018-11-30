@@ -1,0 +1,15 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .bottom {
+    position: fixed;
+    bottom: 0;
+  }
+}
+

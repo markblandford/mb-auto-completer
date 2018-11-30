@@ -1,10 +1,28 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div>
-  <app-auto-completer
-    [items$]="providers$"
-    [numberOfItemsToShow]="10"
-    (itemSelected)="providerSelected($event)"
-    [listMaxHeight]="200"
-  >
-  </app-auto-completer>
+<div class="wrapper">
+  <div class="top">
+      <app-auto-completer
+      [options]="options"
+      [items$]="providers$"
+      (itemSelected)="providerSelected($event)"
+      (filteredItems)="onFilterUpdate($event)"
+    >
+    </app-auto-completer>
+    <div class="filteredListItems">
+      <div *ngFor="let item of filtered">
+        {{item.displayText}}
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <h3>Demonstrating the drop-down without scroll and that it 'pops-up'</h3>
+    Also has a custom 'no results' message.
+      <app-auto-completer
+      [options]="options2"
+      [items$]="providers$"
+      (itemSelected)="providerSelected($event)"
+    >
+    </app-auto-completer>
+  </div>
 </div>

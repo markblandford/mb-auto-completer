@@ -5,12 +5,12 @@
     role="combobox"
     autocomplete="off"
     aria-autocomplete="list"
-    [attr.aria-label]="placeholder"
-    [attr.aria-owns]="'ac-list-' + id"
+    [attr.aria-label]="autoCompleterOptions.placeholder"
+    [attr.aria-owns]="'ac-list-' + autoCompleterOptions.id"
     [attr.aria-expanded]="overlayVisible"
     [attr.aria-activedescendant]="activeItemIndex !== -1 ? 'ac-list-item-' + activeItemIndex : null"
-    [attr.id]="'ac-' + id"
-    [attr.placeholder]="placeholder"
+    [attr.id]="'ac-' + autoCompleterOptions.id"
+    [attr.placeholder]="autoCompleterOptions.placeholder"
     (keydown)="inputKeydown($event)"
     (keyup)="inputKeyup($event)"
     cdkOverlayOrigin
@@ -18,19 +18,26 @@
 </div>
 <div *ngIf="filterStatus" class="auto-completer-status" role="status" aria-atomic="true" aria-live="polite">{{filterStatus}}</div>
 <ng-template cdkPortal #listItemsTemplate="cdkPortal">
-  <div [attr.id]="'ac-list-' + id" class="auto-completer-list" role="listbox" [style.max-height.px]="listMaxHeight">
-    <app-list-item
-      class="item"
-      role="option"
-      *ngFor="let item of filteredItems | slice:0:numberOfItemsToShow; index as index;"
-      [item]="item"
-      [attr.id]="listItemIdPrefix + index"
-      (itemSelected)="showItem($event)"
-      (mouseover)="setActiveItem(index)"
-    >
-      <div class="item-content">
-        <div class="item-content-text">{{item.displayText}}</div>
-      </div>
-    </app-list-item>
+  <div [attr.id]="'ac-list-' + autoCompleterOptions.id" class="auto-completer-list" role="listbox" [style.max-height.px]="autoCompleterOptions.listMaxHeight">
+    <ng-container *ngIf="filteredList?.length > 0 || filteredList?.length === 0 && autoCompleterOptions.noResultOptions?.display === false; else resultsNotFound">
+        <app-list-item
+        class="item"
+        role="option"
+        *ngFor="let item of filteredList | slice:0:autoCompleterOptions.numberOfItemsToShow; index as index;"
+        [item]="item"
+        [attr.id]="getItemId(index)"
+        (itemSelected)="showItem($event)"
+        (mouseover)="setActiveItem(index)"
+      >
+        <div class="item-content">
+          <div class="item-content-text">{{item.displayText}}</div>
+        </div>
+      </app-list-item>
+    </ng-container>
+
   </div>
+</ng-template>
+
+<ng-template #resultsNotFound>
+  {{autoCompleterOptions.noResultOptions?.message}}
 </ng-template>

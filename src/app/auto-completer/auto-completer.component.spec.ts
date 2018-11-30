@@ -1,3 +1,8 @@
+import {
+  QueryList,
+  ElementRef,
+  SimpleChange
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   async,
@@ -6,9 +11,15 @@ import {
   fakeAsync,
   tick
 } from '@angular/core/testing';
-import { of, Subject } from 'rxjs';
+import {
+  of,
+  Subject
+} from 'rxjs';
 import { PortalModule } from '@angular/cdk/portal';
-import { Overlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
+import {
+  Overlay,
+  CdkOverlayOrigin
+} from '@angular/cdk/overlay';
 import {
   DOWN_ARROW,
   UP_ARROW,
@@ -20,9 +31,12 @@ import {
   Z
 } from '@angular/cdk/keycodes';
 import { AutoCompleterComponent } from './auto-completer.component';
-import { AutoCompleterItem } from '.';
+import {
+  AutoCompleterItem,
+  AutoCompleterOptions,
+  NoResultOptions
+} from '.';
 import { ListItemComponent } from './list-item/list-item.component';
-import { QueryList, ElementRef } from '@angular/core';
 
 // seems the ActiveDescendantKeyManager is still using the deprecated keyCode property, hence this mapping
 const keys = {
@@ -111,6 +125,41 @@ describe('AutoCompleterComponent', () => {
     expect(component['listKeyManager']).toBeDefined();
   });
 
+  it('should define the default options', () => {
+    const expectedOptions = <AutoCompleterOptions>{
+      id: '0',
+      listMaxHeight: 'auto',
+      noResultOptions: <NoResultOptions>{ display: true, message: 'No Results Found' },
+      numberOfItemsToShow: 10,
+      placeholder: 'search'
+    };
+
+    expect(component.autoCompleterOptions).toEqual(expectedOptions);
+  });
+
+  it('should merge any input options with the default options', () => {
+    const expectedOptions = <AutoCompleterOptions>{
+      id: 'abc',
+      listMaxHeight: 'auto',
+      noResultOptions: <NoResultOptions>{ display: false, message: 'No Results Found' },
+      numberOfItemsToShow: 100,
+      placeholder: 'search'
+    };
+
+    const inputOptions = <AutoCompleterOptions>{
+      id: 'abc',
+      noResultOptions: <NoResultOptions>{ display: false },
+      numberOfItemsToShow: 100,
+      placeholder: 'search'
+    };
+
+    component.ngOnChanges({
+      options: new SimpleChange(null, inputOptions, true)
+    });
+
+    expect(component.autoCompleterOptions).toEqual(expectedOptions);
+  });
+
   it('should emit an event when an item is selected and hide the overlay', () => {
     const selectedItem = fakeItems[1];
 
@@ -166,8 +215,11 @@ describe('AutoCompleterComponent', () => {
   it('should show the overlay with the filtered items and update the status upon keyup of the "p" key', () => {
     const keyK = <KeyboardEvent>{ code: keys['p'][1], keyCode: keys['p'][0] };
 
-    const expectedFilteredItems = [
-      <AutoCompleterItem>{ id: '1', displayText: 'Death Grips', searchableText: 'death grips rap'}
+    let filteredItemsEmitted = [];
+    component.filteredItems.subscribe(items => filteredItemsEmitted = items);
+
+    const expectedFilteredList = [
+      <AutoCompleterItem>{ id: '1', displayText: 'Death Grips', searchableText: 'death grips rap' }
     ];
 
     const spyShowOverlay = spyOn(component, 'showOverlay');
@@ -176,14 +228,15 @@ describe('AutoCompleterComponent', () => {
     component.inputKeyup(keyK);
 
     expect(spyShowOverlay).toHaveBeenCalledTimes(1);
-    expect(component.filteredItems).toEqual(expectedFilteredItems);
+    expect(component.filteredList).toEqual(expectedFilteredList);
     expect(component.filterStatus).toEqual('1 result found');
+    expect(filteredItemsEmitted).toEqual(expectedFilteredList);
   });
 
   it('should set the status to no results found when there are no results in the filter', () => {
     const keyZ = <KeyboardEvent>{ code: keys['z'][1], keyCode: keys['z'][0] };
 
-    const expectedFilteredItems = [];
+    const expectedFilteredList = [];
 
     const spyShowOverlay = spyOn(component, 'showOverlay');
 
@@ -191,14 +244,14 @@ describe('AutoCompleterComponent', () => {
     component.inputKeyup(keyZ);
 
     expect(spyShowOverlay).toHaveBeenCalledTimes(1);
-    expect(component.filteredItems).toEqual(expectedFilteredItems);
+    expect(component.filteredList).toEqual(expectedFilteredList);
     expect(component.filterStatus).toEqual('no results found');
   });
 
   it('should set the status to the number of results found when there are more than one result in the filter', () => {
     const keyH = <KeyboardEvent>{ code: keys['h'][1], keyCode: keys['h'][0] };
 
-    const expectedFilteredItems = [
+    const expectedFilteredList = [
       <AutoCompleterItem>{ id: '1', displayText: 'Death Grips', searchableText: 'death grips rap'},
       <AutoCompleterItem>{ id: '2', displayText: 'HTRK', searchableText: 'htrk hate rock'},
       <AutoCompleterItem>{ id: '3', displayText: 'Death From Above', searchableText: 'Death From Above 1979'}
@@ -210,7 +263,7 @@ describe('AutoCompleterComponent', () => {
     component.inputKeyup(keyH);
 
     expect(spyShowOverlay).toHaveBeenCalledTimes(1);
-    expect(component.filteredItems).toEqual(expectedFilteredItems);
+    expect(component.filteredList).toEqual(expectedFilteredList);
     expect(component.filterStatus).toEqual('3 results found');
   });
 
@@ -339,5 +392,13 @@ describe('AutoCompleterComponent', () => {
     component.inputKeyup(keyUp);
 
     expect(fakeElement.scrollIntoView).toHaveBeenCalledTimes(2);
+  });
+
+  it('should generate a good item id', () => {
+    const expected = 'ac-list-item-x-99';
+
+    component.autoCompleterOptions.id = 'x';
+
+    expect(component.getItemId(99)).toEqual(expected);
   });
 });

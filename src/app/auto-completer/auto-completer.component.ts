@@ -7,7 +7,9 @@ import {
   Input,
   ViewChild,
   Output,
-  OnInit
+  OnInit,
+  OnChanges,
+  SimpleChanges
 } from '@angular/core';
 import {
   Overlay,
@@ -20,7 +22,11 @@ import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
 import { TemplatePortalDirective } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
 
-import { AutoCompleterItem } from '.';
+import {
+  AutoCompleterItem,
+  AutoCompleterOptions,
+  NoResultOptions
+} from '.';
 import { ListItemComponent } from './list-item/list-item.component';
 
 enum KeyCodes {
@@ -35,32 +41,42 @@ enum KeyCodes {
   templateUrl: './auto-completer.component.html',
   styleUrls: ['./auto-completer.component.scss']
 })
-export class AutoCompleterComponent implements OnInit, AfterViewInit {
+export class AutoCompleterComponent implements OnInit, AfterViewInit, OnChanges {
   private allItems: AutoCompleterItem[];
   private listKeyManager: ActiveDescendantKeyManager<ListItemComponent>;
   private listItemsOverlayRef: OverlayRef;
+  private defaultOptions: AutoCompleterOptions;
 
   public readonly listItemIdPrefix = 'ac-list-item-';
 
   public activeItemIndex = -1;
-  public filteredItems: AutoCompleterItem[] = [];
+  public filteredList: AutoCompleterItem[] = [];
   public filterStatus = '';
   public overlayVisible = false;
   public searchQuery = '';
+  public autoCompleterOptions: AutoCompleterOptions;
 
-  @Input() id = '0';
   @Input() items$: Observable<AutoCompleterItem[]>;
-  @Input() listMaxHeight = 'auto';
-  @Input() numberOfItemsToShow = 10;
-  @Input() placeholder = 'search';
+  @Input() options: AutoCompleterOptions;
 
   @Output() itemSelected = new EventEmitter<AutoCompleterItem>();
+  @Output() filteredItems = new EventEmitter<AutoCompleterItem[]>();
 
   @ViewChild('listItemsTemplate') listItemsTemplate: TemplatePortalDirective;
   @ViewChild(CdkOverlayOrigin) overlayOrigin: CdkOverlayOrigin;
   @ViewChildren(ListItemComponent) listItemComponents: QueryList<ListItemComponent>;
 
-  constructor(private overlay: Overlay) { }
+  constructor(private overlay: Overlay) {
+    this.defaultOptions = <AutoCompleterOptions>{
+      id: '0',
+      listMaxHeight: 'auto',
+      noResultOptions: <NoResultOptions>{ display: true, message: 'No Results Found' },
+      numberOfItemsToShow: 10,
+      placeholder: 'search'
+    };
+
+    this.autoCompleterOptions = this.defaultOptions;
+  }
 
   ngOnInit(): void {
     this.items$.subscribe(val => {
@@ -70,6 +86,21 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.initKeyManagerHandlers();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    /* istanbul ignore else */
+    if (changes && changes['options']) {
+      const inputOptions = changes['options'].currentValue;
+      /* istanbul ignore else */
+      if (inputOptions) {
+        // There are some input options so merge them into the default ones
+        const nro = { ...this.autoCompleterOptions.noResultOptions, ...inputOptions.noResultOptions };
+        this.autoCompleterOptions = { ...this.autoCompleterOptions, ...inputOptions };
+
+        this.autoCompleterOptions.noResultOptions = nro;
+      }
+    }
   }
 
   private initKeyManagerHandlers() {
@@ -97,8 +128,8 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
     } else {
       this.showOverlay();
 
-      this.filteredItems = this.allItems.filter(p => p.searchableText.toLowerCase().includes(this.searchQuery.toLowerCase()));
-
+      this.filteredList = this.allItems.filter(p => p.searchableText.toLowerCase().includes(this.searchQuery.toLowerCase()));
+      this.filteredItems.emit(this.filteredList);
       this.updateStatus();
 
       /* istanbul ignore else */
@@ -129,8 +160,8 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   private updateStatus(clear = false): void {
     if (clear) {
       this.filterStatus = null;
-    } else if (this.filteredItems && this.filteredItems.length > 0) {
-      const count = Math.min(this.filteredItems.length, this.numberOfItemsToShow);
+    } else if (this.filteredList && this.filteredList.length > 0) {
+      const count = Math.min(this.filteredList.length, this.autoCompleterOptions.numberOfItemsToShow);
       if (count === 1) {
         this.filterStatus = '1 result found';
       } else {
@@ -171,11 +202,15 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit {
   }
 
   private scrollToListItem(): void {
-    const el = document.getElementById(this.listItemIdPrefix + this.listKeyManager.activeItemIndex);
+    const el = document.getElementById(this.getItemId(this.listKeyManager.activeItemIndex));
     /* istanbul ignore else */
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
     }
+  }
+
+  public getItemId(index: number): string {
+    return this.listItemIdPrefix + this.autoCompleterOptions.id + '-' + index;
   }
 
   private hideOverlay(): void {
