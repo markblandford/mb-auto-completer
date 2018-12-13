@@ -267,9 +267,11 @@ describe('AutoCompleterComponent', () => {
     expect(component.filterStatus).toEqual('3 results found');
   });
 
-  it('should navigate through the list upon keyup of the down and up arrow keys', () => {
+  it('should navigate through the list upon keyup of the down and up arrow keys and not emit a filteredItems event', () => {
     const keyDown = <KeyboardEvent>{ code: keys['DOWN_ARROW'][1], keyCode: keys['DOWN_ARROW'][0], preventDefault: () => {} };
     const keyUp = <KeyboardEvent>{ code: keys['UP_ARROW'][1], keyCode: keys['UP_ARROW'][0], preventDefault: () => {} };
+
+    const spyFilteredItems = spyOn(component.filteredItems, 'emit');
 
     component.listItemComponents = fakeListItemComponents;
     component.ngAfterViewInit();
@@ -289,11 +291,14 @@ describe('AutoCompleterComponent', () => {
     component.inputKeyup(keyUp);
     component.inputKeyup(keyUp);
     expect(component.activeItemIndex).toEqual(1);
+    expect(spyFilteredItems).toHaveBeenCalledTimes(0);
   });
 
-  it('should select the active item upon keyup of the enter key', () => {
+  it('should select the active item upon keyup of the enter key and not emit a filteredItems event', () => {
     const keyDown = <KeyboardEvent>{ code: keys['DOWN_ARROW'][1], keyCode: keys['DOWN_ARROW'][0], preventDefault: () => {} };
     const keyEnter = <KeyboardEvent>{ code: keys['ENTER'][1], keyCode: keys['ENTER'][0], preventDefault: () => {} };
+
+    const spyFilteredItems = spyOn(component.filteredItems, 'emit');
 
     component.listItemComponents = fakeListItemComponents;
     component.ngAfterViewInit();
@@ -304,8 +309,27 @@ describe('AutoCompleterComponent', () => {
     component.inputKeyup(keyEnter);
 
     expect(spyItemSelected).toHaveBeenCalledTimes(1);
+    expect(spyFilteredItems).toHaveBeenCalledTimes(0);
   });
 
+  it('should only emit a filteredItems event when the filtered list has changed', () => {
+    const keyDown = <KeyboardEvent>{ code: keys['DOWN_ARROW'][1], keyCode: keys['DOWN_ARROW'][0], preventDefault: () => {} };
+    const keyH = <KeyboardEvent>{ code: keys['h'][1], keyCode: keys['h'][0] };
+
+    const spyFilteredItems = spyOn(component.filteredItems, 'emit');
+
+    component.listItemComponents = fakeListItemComponents;
+    component.ngAfterViewInit();
+
+    component.inputKeyup(keyDown);
+    component.searchQuery = 'h';
+    component.inputKeyup(keyH);
+    component.searchQuery = 'hh';
+    component.inputKeyup(keyH);
+    component.inputKeyup(keyDown);
+
+    expect(spyFilteredItems).toHaveBeenCalledTimes(2);
+  });
 
   it('should set the active item in the key manager', () => {
     component.listItemComponents = fakeListItemComponents;

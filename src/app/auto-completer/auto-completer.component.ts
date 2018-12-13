@@ -128,9 +128,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit, OnChanges 
     } else {
       this.showOverlay();
 
-      this.filteredList = this.allItems.filter(p => p.searchableText.toLowerCase().includes(this.searchQuery.toLowerCase()));
-      this.filteredItems.emit(this.filteredList);
-      this.updateStatus();
+      this.updateFilteredList();
 
       /* istanbul ignore else */
       if (this.listKeyManager) {
@@ -155,6 +153,17 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit, OnChanges 
     }
 
     return false;
+  }
+
+  private updateFilteredList() {
+    const currentFilter = this.filteredList.length > 0 ? JSON.stringify(this.filteredList) : JSON.stringify(this.allItems);
+    this.filteredList = this.allItems.filter(p => p.searchableText.toLowerCase().includes(this.searchQuery.toLowerCase()));
+
+    if (currentFilter !== JSON.stringify(this.filteredList)) {
+      this.filteredItems.emit(this.filteredList);
+    }
+
+    this.updateStatus();
   }
 
   private updateStatus(clear = false): void {
