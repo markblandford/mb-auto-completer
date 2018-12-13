@@ -26,6 +26,7 @@ import {
   LEFT_ARROW,
   ESCAPE,
   ENTER,
+  DELETE,
   H,
   P,
   Z
@@ -45,6 +46,7 @@ const keys = {
   'LEFT_ARROW': [LEFT_ARROW, 'ArrowLeft'],
   'ESCAPE': [ESCAPE, 'Escape'],
   'ENTER': [ENTER, 'Enter'],
+  'DELETE': [DELETE, 'Delete'],
   'h': [H, 'h'],
   'p': [P, 'p'],
   'z': [Z, 'z']
@@ -424,5 +426,38 @@ describe('AutoCompleterComponent', () => {
     component.autoCompleterOptions.id = 'x';
 
     expect(component.getItemId(99)).toEqual(expected);
+  });
+
+  it('should emit an event when the filtered list is empty', () => {
+    const keyZ = <KeyboardEvent>{ code: keys['z'][1], keyCode: keys['z'][0] };
+
+    const expectedFilteredList = [];
+
+    const spyHasResults = spyOn(component.hasResults, 'emit');
+
+    component.searchQuery = 'z';
+    component.inputKeyup(keyZ);
+
+    expect(component.filteredList).toEqual(expectedFilteredList);
+    expect(component.filterStatus).toEqual('no results found');
+    expect(spyHasResults).toHaveBeenCalledTimes(1);
+    expect(spyHasResults).toHaveBeenCalledWith(false);
+  });
+
+  it('should emit an event when the filtered list goes from empty to not empty', () => {
+    const keyZ = <KeyboardEvent>{ code: keys['z'][1], keyCode: keys['z'][0] };
+    const keyDelete = <KeyboardEvent>{ code: keys['DELETE'][1], keyCode: keys['DELETE'][0] };
+
+    const spyHasResults = spyOn(component.hasResults, 'emit');
+
+    component.searchQuery = 'z';
+    component.inputKeyup(keyZ);
+
+    component.searchQuery = '';
+    component.inputKeyup(keyDelete);
+
+    expect(spyHasResults).toHaveBeenCalledTimes(2);
+    expect(spyHasResults).toHaveBeenCalledWith(false);
+    expect(spyHasResults).toHaveBeenCalledWith(true);
   });
 });

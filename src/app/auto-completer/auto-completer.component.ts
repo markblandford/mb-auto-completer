@@ -46,6 +46,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit, OnChanges 
   private listKeyManager: ActiveDescendantKeyManager<ListItemComponent>;
   private listItemsOverlayRef: OverlayRef;
   private defaultOptions: AutoCompleterOptions;
+  private resultsMonitor: boolean;
 
   public readonly listItemIdPrefix = 'ac-list-item-';
 
@@ -61,6 +62,7 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit, OnChanges 
 
   @Output() itemSelected = new EventEmitter<AutoCompleterItem>();
   @Output() filteredItems = new EventEmitter<AutoCompleterItem[]>();
+  @Output() hasResults = new EventEmitter<boolean>();
 
   @ViewChild('listItemsTemplate') listItemsTemplate: TemplatePortalDirective;
   @ViewChild(CdkOverlayOrigin) overlayOrigin: CdkOverlayOrigin;
@@ -161,6 +163,13 @@ export class AutoCompleterComponent implements OnInit, AfterViewInit, OnChanges 
 
     if (currentFilter !== JSON.stringify(this.filteredList)) {
       this.filteredItems.emit(this.filteredList);
+    }
+
+    const tempHasResults = this.filteredList.length > 0;
+
+    if (this.resultsMonitor !== tempHasResults) {
+      this.resultsMonitor = tempHasResults;
+      this.hasResults.emit(tempHasResults);
     }
 
     this.updateStatus();
