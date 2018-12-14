@@ -8,7 +8,7 @@
     [attr.aria-label]="autoCompleterOptions.placeholder"
     [attr.aria-owns]="'ac-list-' + autoCompleterOptions.id"
     [attr.aria-expanded]="overlayVisible"
-    [attr.aria-activedescendant]="activeItemIndex !== -1 ? 'ac-list-item-' + activeItemIndex : null"
+    [attr.aria-activedescendant]="activeItemIndex !== -1 ? getItemId(activeItemIndex) : null"
     [attr.id]="'ac-' + autoCompleterOptions.id"
     [attr.placeholder]="autoCompleterOptions.placeholder"
     (keydown)="inputKeydown($event)"
