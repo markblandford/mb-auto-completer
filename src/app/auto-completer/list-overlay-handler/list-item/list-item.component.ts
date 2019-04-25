@@ -1,19 +1,18 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { Highlightable } from '@angular/cdk/a11y';
-
-import { AutoCompleterItem } from '..';
+import { ListOverlayItem } from '.';
 
 @Component({
   selector: 'app-list-item',
   templateUrl: './list-item.component.html',
   styleUrls: ['./list-item.component.scss']
 })
-export class ListItemComponent implements Highlightable {
+export class ListItemComponent<T extends ListOverlayItem> implements Highlightable {
   private _isActive = false;
 
-  @Input() item: AutoCompleterItem;
+  @Input() item: ListOverlayItem;
   @Input() disabled = false;
-  @Output() itemSelected = new EventEmitter<AutoCompleterItem>();
+  @Output() itemSelected = new EventEmitter<ListOverlayItem>();
 
   constructor() { }
 

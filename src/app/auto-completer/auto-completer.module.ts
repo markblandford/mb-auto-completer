@@ -4,19 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { PortalModule } from '@angular/cdk/portal';
 
-import { ListItemComponent } from './list-item/list-item.component';
 import { AutoCompleterComponent } from './auto-completer.component';
+import { ListItemModule } from './list-overlay-handler/list-item/list-item.module';
 
 @NgModule({
   declarations: [
-    ListItemComponent,
     AutoCompleterComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     OverlayModule,
-    PortalModule
+    PortalModule,
+    ListItemModule
   ],
   exports: [
     AutoCompleterComponent

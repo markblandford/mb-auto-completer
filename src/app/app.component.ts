@@ -3,7 +3,11 @@ import { Component, OnInit } from '@angular/core';
 
 import * as faker from 'faker';
 import { Observable, of } from 'rxjs';
-import { AutoCompleterItem, AutoCompleterOptions, NoResultOptions } from './auto-completer';
+import { AutoCompleterItem } from './auto-completer';
+import {
+  ListOverlayOptions,
+  NoResultOptions
+} from './auto-completer/list-overlay-handler/list-item';
 
 @Component({
   selector: 'app-root',
@@ -13,11 +17,11 @@ import { AutoCompleterItem, AutoCompleterOptions, NoResultOptions } from './auto
 export class AppComponent implements OnInit {
   public providers$: Observable<AutoCompleterItem[]> = of([]);
   public filtered: AutoCompleterItem[] = [];
-  public options = <AutoCompleterOptions>{
+  public options = <ListOverlayOptions>{
     numberOfItemsToShow: 10,
     listMaxHeight: '200'
   };
-  public options2 = <AutoCompleterOptions>{
+  public options2 = <ListOverlayOptions>{
     id: 'x',
     numberOfItemsToShow: 5,
     placeholder: 'search...',

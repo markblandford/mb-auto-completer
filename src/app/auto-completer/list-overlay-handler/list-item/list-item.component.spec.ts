@@ -1,11 +1,10 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, TestBed } from '@angular/core/testing';
 
 import { ListItemComponent } from './list-item.component';
-import { AutoCompleterItem } from '..';
+import { ListOverlayItem } from '.';
 
 describe('ListItemComponent', () => {
-  let component: ListItemComponent;
-  let fixture: ComponentFixture<ListItemComponent>;
+  let component: ListItemComponent<ListOverlayItem>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -15,9 +14,7 @@ describe('ListItemComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ListItemComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    component = new ListItemComponent<ListOverlayItem>();
   });
 
   it('should create', () => {
@@ -25,9 +22,9 @@ describe('ListItemComponent', () => {
   });
 
   it('should emit an event when the item is selected', () => {
-    let itemSelected: AutoCompleterItem;
+    let itemSelected: ListOverlayItem;
 
-    const fakeItem = <AutoCompleterItem>{ id: 'i', displayText: 'Minion', searchableText: 'Minion' };
+    const fakeItem = <ListOverlayItem>{ id: 'i', displayText: 'Minion' };
 
     component.item = fakeItem;
 

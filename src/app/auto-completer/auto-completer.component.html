@@ -1,29 +1,30 @@
-<div class="auto-completer-input-wrapper">
+<div class="list-overlay-input-wrapper">
   <input
-    [(ngModel)]="searchQuery"
+    [(ngModel)]="searchInput"
+    class="form-control"
     type="text"
     role="combobox"
     autocomplete="off"
     aria-autocomplete="list"
-    [attr.aria-label]="autoCompleterOptions.placeholder"
-    [attr.aria-owns]="'ac-list-' + autoCompleterOptions.id"
+    [attr.aria-label]="listOverlayOptions.placeholder"
+    [attr.aria-owns]="'ac-list-' + listOverlayOptions.id"
     [attr.aria-expanded]="overlayVisible"
     [attr.aria-activedescendant]="activeItemIndex !== -1 ? getItemId(activeItemIndex) : null"
-    [attr.id]="'ac-' + autoCompleterOptions.id"
-    [attr.placeholder]="autoCompleterOptions.placeholder"
+    [attr.id]="'ac-' + listOverlayOptions.id"
+    [attr.placeholder]="listOverlayOptions.placeholder"
     (keydown)="inputKeydown($event)"
     (keyup)="inputKeyup($event)"
     cdkOverlayOrigin
   >
 </div>
-<div *ngIf="filterStatus" class="auto-completer-status" role="status" aria-atomic="true" aria-live="polite">{{filterStatus}}</div>
-<ng-template cdkPortal #listItemsTemplate="cdkPortal">
-  <div [attr.id]="'ac-list-' + autoCompleterOptions.id" class="auto-completer-list" role="listbox" [style.max-height.px]="autoCompleterOptions.listMaxHeight">
-    <ng-container *ngIf="filteredList?.length > 0 || filteredList?.length === 0 && autoCompleterOptions.noResultOptions?.display === false; else resultsNotFound">
-        <app-list-item
+<div *ngIf="filterStatus" class="aria-live-list-overlay-status" role="status" aria-atomic="true" aria-live="polite">{{filterStatus}}</div>
+<ng-template cdkPortal #listOverlayItemsTemplate="cdkPortal">
+  <div [attr.id]="'ac-list-' + listOverlayOptions.id" class="list-overlay-list" role="listbox" [style.max-height.px]="listOverlayOptions.listMaxHeight">
+    <ng-container *ngIf="filtered?.length > 0 || filtered?.length === 0 && listOverlayOptions.noResultOptions?.display === false; else resultsNotFound">
+      <app-list-item
         class="item"
         role="option"
-        *ngFor="let item of filteredList | slice:0:autoCompleterOptions.numberOfItemsToShow; index as index;"
+        *ngFor="let item of filteredList | async | slice:0:listOverlayOptions.numberOfItemsToShow; index as index;"
         [item]="item"
         [attr.id]="getItemId(index)"
         (itemSelected)="showItem($event)"
@@ -39,5 +40,5 @@
 </ng-template>
 
 <ng-template #resultsNotFound>
-  {{autoCompleterOptions.noResultOptions?.message}}
+  {{listOverlayOptions.noResultOptions?.message}}
 </ng-template>

@@ -1,19 +1,5 @@
-export interface AutoCompleterItem {
-  id: string;
-  displayText: string;
+import { ListOverlayItem } from './list-overlay-handler/list-item';
+
+export interface AutoCompleterItem extends ListOverlayItem {
   searchableText: string;
-  item?: object;
-}
-
-export interface NoResultOptions {
-  display?: boolean;
-  message?: string;
-}
-
-export interface AutoCompleterOptions {
-  id?: string;
-  listMaxHeight?: string;
-  noResultOptions?: NoResultOptions;
-  numberOfItemsToShow?: number;
-  placeholder?: string;
 }
