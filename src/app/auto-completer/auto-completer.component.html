@@ -14,6 +14,7 @@
     [attr.placeholder]="listOverlayOptions.placeholder"
     (keydown)="inputKeydown($event)"
     (keyup)="inputKeyup($event)"
+    (input)="onInput($event)"
     cdkOverlayOrigin
   >
 </div>

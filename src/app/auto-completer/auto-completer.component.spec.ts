@@ -247,7 +247,7 @@ describe('LgAutoCompleteComponent', () => {
   });
 
   it('should show the overlay and update the filtered list when the overlay is called to be initialised', () => {
-    const spy = spyOn(component, 'showOverlay').and.callFake(() => {});
+    const spy = spyOn(component, 'showOverlay');
 
     const expected = [
       <AutoCompleterItem>{ id: '1', displayText: 'Death Grips', searchableText: 'death grips rap'}

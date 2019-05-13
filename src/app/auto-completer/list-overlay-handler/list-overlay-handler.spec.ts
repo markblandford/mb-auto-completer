@@ -66,6 +66,7 @@ class FakeListItem extends ListItemComponent<ListOverlayItem> {
   }
 }
 
+// noinspection AngularInvalidTemplateReferenceVariable, AngularMissingOrInvalidDeclarationInModule
 @Component({
   selector: 'app-test-list-overlay',
   template: `
@@ -134,6 +135,20 @@ describe('ListOverlayHandler', () => {
 
     // ngAfterViewInit
     expect(component['listKeyManager']).toBeDefined();
+  });
+
+  it('should respond to the Input event as if a key press was made', () => {
+    const showOverlaySpy = spyOn(component, 'showOverlay');
+    const searchMadeSpy = spyOn<any>(component, 'searchMade');
+    const updateListSpy = spyOn<any>(component, 'updateFilteredList');
+
+    const fakeEvent = <Event>{};
+
+    component.onInput(fakeEvent);
+
+    expect(showOverlaySpy).toHaveBeenCalledTimes(1);
+    expect(searchMadeSpy).toHaveBeenCalledTimes(1);
+    expect(updateListSpy).toHaveBeenCalledTimes(1);
   });
 
   it('should enable hiding the overlay when it loses focus', () => {

@@ -167,6 +167,15 @@ export abstract class ListOverlayHandler<T extends ListOverlayItem> implements O
     return false;
   }
 
+  public onInput(event: Event): boolean {
+    this.showOverlay();
+
+    this.searchMade();
+    this.updateFilteredList();
+
+    return true;
+  }
+
   protected getKeyCode(event: KeyboardEvent): string {
     const code = event.code;
 
